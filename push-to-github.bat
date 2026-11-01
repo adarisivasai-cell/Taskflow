@@ -8,7 +8,7 @@ git push -u origin main
 
 echo.
 if %ERRORLEVEL% equ 0 (
-    echo [SUCCESS] Successfully pushed all files to GitHub!
+    echo [SUCCESS] Successfully pushed all TaskFlow files to GitHub!
 ) else (
     echo [FAILED] Push encountered an issue. Check your credentials or internet connection.
 )
