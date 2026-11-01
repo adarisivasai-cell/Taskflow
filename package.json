@@ -1,0 +1,11 @@
+{
+  "name": "taskflow-root",
+  "version": "1.0.0",
+  "description": "TaskFlow — Full-Stack Project Management Platform",
+  "scripts": {
+    "start:backend": "npm --prefix backend start",
+    "start:frontend": "npm --prefix frontend dev",
+    "seed": "npm --prefix backend run seed",
+    "build:frontend": "npm --prefix frontend run build"
+  }
+}
