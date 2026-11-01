@@ -27,8 +27,12 @@ const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
 const app = express();
 
 // Middlewares
+const allowedOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map(o => o.trim())
+  : true; // allow all in dev
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: allowedOrigins,
   credentials: true,
 }));
 app.use(express.json());
