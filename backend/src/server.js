@@ -1,6 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 import { connectDB } from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import User from './models/User.js';
@@ -16,6 +19,10 @@ import notificationRoutes from './routes/notificationRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const frontendDistPath = path.resolve(__dirname, '../../frontend/dist');
 
 const app = express();
 
@@ -45,7 +52,20 @@ app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 
-// 404 Route Handler
+// Serve Frontend static assets in production if build exists
+if (fs.existsSync(frontendDistPath)) {
+  console.log(`[Static] Serving frontend static assets from: ${frontendDistPath}`);
+  app.use(express.static(frontendDistPath));
+
+  app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api')) {
+      return next();
+    }
+    res.sendFile(path.join(frontendDistPath, 'index.html'));
+  });
+}
+
+// 404 Route Handler for undefined API routes
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -75,15 +95,14 @@ const startServer = async () => {
 
   const server = app.listen(PORT, () => {
     console.log(`====================================================`);
-    console.log(`🚀 TaskFlow Backend Server running on port ${PORT}`);
+    console.log(`🚀 TaskFlow Full-Stack Server running on port ${PORT}`);
+    console.log(`📡 Application URL: http://localhost:${PORT}`);
     console.log(`📡 Health Check: http://localhost:${PORT}/api/health`);
     console.log(`====================================================`);
   });
 
-  // Graceful shutdown
   process.on('unhandledRejection', (err) => {
     console.error(`Unhandled Rejection Error: ${err.message}`);
-    // server.close(() => process.exit(1));
   });
 };
 
